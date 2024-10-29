@@ -1,0 +1,10 @@
+[submodule "otserver"]
+  path = otserver
+  url = git@github.com:vaigu-com/otserver.git
+  branch = dev
+[submodule "otclient"]
+  path = otclient
+  url = git@github.com:mehah/otclient.git
+[submodule "myaac"]
+  path = myaac
+  url = git@github.com:slawkens/myaac.git
