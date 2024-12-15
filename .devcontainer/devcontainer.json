@@ -1,0 +1,38 @@
+{
+  "name": "OTS dev env",
+  "runArgs": [
+    "--network=host"
+  ],
+  "mounts": [
+    "source=/run/user/1000/wayland-1,target=/wayland-1,type=bind",
+    "source=${localEnv:XDG_RUNTIME_DIR},target=${localEnv:XDG_RUNTIME_DIR},type=bind"
+  ],
+  "containerEnv": {
+      "WAYLAND_DISPLAY": "wayland-1",
+      "XDG_RUNTIME_DIR": "${localEnv:XDG_RUNTIME_DIR}"
+  },
+  "containerUser": "${localEnv:USER}",
+  "remoteUser": "${localEnv:USER}",
+  "build": {
+    "dockerfile": "../Dockerfile.devcontainer",
+    "context": "..",
+    "args": {
+      "REMOTE_USER": "${localEnv:USER}",
+      "REMOTE_UID": "${localEnv:REMOTE_UID:1000}",
+      "REMOTE_GID": "${localEnv:REMOTE_GID:1000}"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cmake-tools",
+        "fredericbonnet.cmake-test-adapter",
+        "twxs.cmake",
+        "ms-vscode.cpptools-extension-pack",
+        "eamodio.gitlens",
+        "GitHub.copilot",
+        "bmewburn.vscode-intelephense-client"
+      ]
+    }
+  }
+}

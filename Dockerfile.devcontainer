@@ -1,0 +1,48 @@
+FROM kuyoh/vcpkg:2024.10.21
+
+# RUN vcpkg install abseil argon2 asio bext-di bext-ut curl eventpp luajit magic-enum mio parallel-hashmap protobuf pugixml spdlog zlib bshoshany-thread-pool opentelemetry-cpp[core,otlp-http,prometheus]
+# RUN vcpkg install asio abseil cpp-httplib discord-rpc liblzma libogg libvorbis nlohmann-json openal-soft openssl parallel-hashmap physfs protobuf pugixml stduuid zlib
+
+# devcontainer setup, see .devcontainer/devcontainer.json
+ARG REMOTE_USER
+ARG REMOTE_UID
+ARG REMOTE_GID
+
+RUN apt update && apt upgrade -y
+RUN apt install -y wget p7zip
+
+WORKDIR /app
+RUN wget https://www.dropbox.com/s/5j9kszrwog99zs8/animated-items-and-outfits.zip?dl=1 -O animated-items-and-outfits.zip
+RUN 7z x animated-items-and-outfits.zip
+RUN 7z x animated-items-and-outfits/animated-items.zip -o=items
+RUN 7z x animated-items-and-outfits/animated-outfits.zip
+RUN rm -rf animated-items-and-outfits *.zip
+
+RUN apt install -y sudo git zip unzip curl nginx nginx-extras composer \
+  php-fpm php-zip php-xml php-mysql php-gd php-curl php-bcmath mariadb-client ca-certificates \
+  cmake automake build-essential libglew-dev libx11-dev autoconf libtool pkg-config tzdata libssl3 \
+  npm nodejs \
+  && dpkg-reconfigure --frontend noninteractive tzdata 
+
+RUN apt install -y libwayland-dev libxkbcommon-dev wayland-protocols extra-cmake-modules
+RUN apt install -y libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config libltdl-dev python3-jinja2 bison python3-setuptools
+
+RUN apt install -y libwayland-client0 libwayland-cursor0 libwayland-egl1 libxkbcommon0 wayland-protocols  
+ENV XDG_RUNTIME_DIR=/tmp
+ENV WAYLAND_DISPLAY=wayland-0
+RUN mkdir -p /var/opt/vcpkg; chown -R ${REMOTE_USER}:${REMOTE_USER} /var/opt/vcpkg
+
+
+# fix file permissions on host
+RUN groupmod -n ${REMOTE_USER} ubuntu && \
+  usermod -l ${REMOTE_USER} ubuntu
+RUN echo "${REMOTE_USER} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+RUN chown ${REMOTE_USER}:${REMOTE_USER} -R /opt/vcpkg
+
+RUN sed -i "/^$$Service$$/a User=${REMOTE_USER}\nGroup=${REMOTE_USER}" "/lib/systemd/system/nginx.service"
+RUN sed -i '/listen\.\(owner\|group\)/!s/www-data/${REMOTE_USER}/g' /etc/php/8.3/fpm/pool.d/www.conf
+
+RUN ln -sf /workspaces/multi/nginx.conf /etc/nginx/sites-enabled/default
+
+USER ${REMOTE_USER}
+

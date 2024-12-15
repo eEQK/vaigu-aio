@@ -1,10 +1,12 @@
 [submodule "otserver"]
-  path = otserver
-  url = git@github.com:vaigu-com/otserver.git
-  branch = dev
+	path = otserver
+	url = git@github.com:vaigu-com/otserver.git
 [submodule "otclient"]
-  path = otclient
-  url = git@github.com:mehah/otclient.git
-[submodule "myaac"]
-  path = myaac
-  url = git@github.com:slawkens/myaac.git
+	path = otclient
+	url = git@github.com:mehah/otclient.git
+[submodule "canaryaac"]
+	path = canaryaac
+	url = git@github.com:opentibiabr/canaryaac.git
+[submodule "login-server"]
+	path = login-server
+	url = git@github.com:opentibiabr/login-server.git
